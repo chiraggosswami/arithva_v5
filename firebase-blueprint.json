@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and workspace metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "storeName": {
+          "type": "string",
+          "description": "User brand or store name"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User profile avatar URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp when profile was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp when profile was last updated"
+        }
+      },
+      "required": ["userId", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private user profile and workspace settings"
+    }
+  }
+}

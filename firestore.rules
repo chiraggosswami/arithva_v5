@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // User profile document rules
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false; // PII isolation - disallow public listing of user profiles
+      allow create: if isOwner(userId) && isValidId(userId)
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254;
+      allow update: if isOwner(userId) && isValidId(userId)
+        && request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+  }
+}
